@@ -35,12 +35,38 @@ use warnings;
 =cut
 
 sub clone {
-	my $orig = shift;
-	my $cloned;
-	# ...
-	# deep clone algorith here
-	# ...
-	return $cloned;
+	my %cloned;
+	my $bad;
+	my $copy;
+	$copy = sub {
+		my $orig = shift;
+		return $cloned{$orig} if ((defined $orig) && (exists $cloned{$orig}));		
+		if (ref $orig eq 'ARRAY') {
+			my @array = @$orig;
+			$cloned{$orig} = \@array;
+			foreach my $key (@array) {
+				$key = $copy->($key);
+			}
+			return \@array;
+		}
+		elsif (ref $orig eq 'HASH') {
+			my %hash = %$orig;
+			$cloned{$orig} = \%hash;
+			for my $value (values %hash) {
+				$value = $copy->($value);
+			}
+			return \%hash;
+		}
+		elsif (ref $orig eq '') {
+			return $orig;
+		}
+		else {
+			return $bad = 1;
+		}
+	};
+	$copy = $copy->(shift);
+	$copy = undef if $bad;
+	return $copy;
 }
 
 1;
