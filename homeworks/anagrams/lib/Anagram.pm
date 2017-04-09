@@ -3,7 +3,7 @@ package Anagram;
 use 5.010;
 use strict;
 use warnings;
-
+use Encode;
 =encoding UTF8
 
 =head1 SYNOPSIS
@@ -42,11 +42,25 @@ anagram(['пятак', 'ЛиСток', 'пятка', 'стул', 'ПяТаК', '
 sub anagram {
     my $words_list = shift;
     my %result;
-
-    #
-    # Поиск анограмм
-    #
-
+    	foreach my $word (@$words_list) {
+		my $word = lc (decode('utf-8', $word));
+		my $sorted = join ('', sort split ('', $word));
+		my @words;
+		@words = @{$result{$sorted}} if (exists $result{$sorted});
+		push @words, $word;
+		$result{$sorted} = \@words;
+	}
+	foreach my $key (keys %result) {
+		my @words = @{$result{$key}};
+		delete $result{$key};
+		$key = encode ('utf-8', $words[0]);
+		my %hash;
+		@words = sort (grep{!$hash{$_}++} @words);
+		foreach my $value (@words) {
+			$value = encode ('utf-8', $value);
+		}
+		$result{$key} = \@words if ($key && (@words > 1));
+	}
     return \%result;
 }
 
