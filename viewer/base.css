@@ -10,6 +10,10 @@
 }
 */
 
+.perl-nof {
+	overflow-x: visible !important;
+}
+
 .apos .remark-code-span-highlighted {
     background-color: #e8e8e8;
 
@@ -78,7 +82,7 @@ content: "`";
     font-family: "HelveticaNeueCyrBold";
 }
 
-.not .perl .remark-code-line-highlighted {
+.not .remark-code-line-highlighted, .not .remark-code-span-highlighted {
     background-color: rgba(255, 0, 0, 0.5)
 }
 
@@ -201,10 +205,16 @@ table td, table th {}
 .w70 {
     width: 69%;
 }
+.w50 {
+    width: 49%;
+}
 .w30 {
     width: 29%;
 }
-
+.h100 {
+    height: 100%;
+    max-height: 100%;
+}
 .clear {
     content: "";
     display: table;
