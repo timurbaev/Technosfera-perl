@@ -14,11 +14,11 @@ $SIG{'INT'} = sub {
 	warn "Double Ctrl+C for exit";
 	$exit = 1;
 };
-print "Get ready\n";
 my $file;
 GetOptions ("file=s" => \$file);
 die unless defined $file;
 open($fh, '>', $file) or die $!;
+print "Get ready\n";
 while (<>) {
 	$exit = 0;
 	$count++;
