@@ -27,36 +27,34 @@ sub parse {
 	my $buf = shift;
 	switch (unpack "A", $buf) {
 		case 'Z' {return {};}
-		case 'D' {
-			my $func;
-			$func = sub {
-				my @sublist;
-				while ((my $action, $buf) = unpack "A A*", $buf) {
-					switch ($action) {
-						case 'D' {
-							(my $high, my $low, $buf) = unpack("C2 A*", $buf);
-							my $len = $high * 256 + $low;
-							(my $directory, $high, $low, $buf) = unpack("A$len C2 A*", $buf);
-							push @sublist, {type => "directory", name => decode('utf-8', $directory), mode => mode2s($high * 256 + $low)};	
-						}
-						case 'F' {
-							(my $high, my $low, $buf) = unpack("C2 A*", $buf);
-							my $len = $high * 256 + $low;
-							(my $file, $high, $low, my $high1, my $high2, my $low1, my $low2, my $hash, $buf) = unpack("A$len C2 C4 A20 A*", $buf);
-							push @sublist, {type => "file", size => $high1 * 16777216 + $high2 * 65536 + $low1 * 256 + $low2, name => decode('utf-8', $file), mode => mode2s ($high * 256 + $low), hash => unpack "H*", $hash};
-						}
-						$sublist[-1]->{list} = $func->() case 'I';
-						return [@sublist] case 'U';
-						case 'Z' {
-							die "Garbage ae the end of the buffer" if $buf;
-							return @sublist;
-						}
-					}
-				}
-			};
-			return $func->();
-		}
+		case 'D' {return func (\$buf);}
 		die "The blob should start from 'D' or 'Z'";
+	}
+}
+sub func {
+	my $buf = shift;
+	my @sublist;
+	while ((my $action, $$buf) = unpack "A A*", $$buf) {
+		switch ($action) {
+			case 'D' {
+				(my $high, my $low, $$buf) = unpack("C2 A*", $$buf);
+				my $len = $high * 256 + $low;
+				(my $directory, $high, $low, $$buf) = unpack("A$len C2 A*", $$buf);
+				push @sublist, {type => "directory", name => decode('utf-8', $directory), mode => mode2s($high * 256 + $low)};	
+			}
+			case 'F' {
+				(my $high, my $low, $$buf) = unpack("C2 A*", $$buf);
+				my $len = $high * 256 + $low;
+				(my $file, $high, $low, my $high1, my $high2, my $low1, my $low2, my $hash, $$buf) = unpack("A$len C2 C4 A20 A*", $$buf);
+				push @sublist, {type => "file", size => $high1 * 16777216 + $high2 * 65536 + $low1 * 256 + $low2, name => decode('utf-8', $file), mode => mode2s ($high * 256 + $low), hash => unpack "H*", $hash};
+			}
+			$sublist[-1]->{list} = func($buf) case 'I';
+			return [@sublist] case 'U';
+			case 'Z' {
+				die "Garbage ae the end of the buffer" if $$buf;
+				return @sublist;
+			}
+		}
 	}
 }
 
