@@ -37,16 +37,12 @@ sub func {
 	while ((my $action, $$buf) = unpack "A A*", $$buf) {
 		switch ($action) {
 			case 'D' {
-				(my $high, my $low, $$buf) = unpack("C2 A*", $$buf);
-				my $len = $high * 256 + $low;
-				(my $directory, $high, $low, $$buf) = unpack("A$len C2 A*", $$buf);
-				push @sublist, {type => "directory", name => decode('utf-8', $directory), mode => mode2s($high * 256 + $low)};	
+				(my $directory, my $flags, $$buf) = unpack "n/A* n A*", $$buf;
+				push @sublist, {type => "directory", name => decode('utf-8', $directory), mode => mode2s($flags)};	
 			}
 			case 'F' {
-				(my $high, my $low, $$buf) = unpack("C2 A*", $$buf);
-				my $len = $high * 256 + $low;
-				(my $file, $high, $low, my $high1, my $high2, my $low1, my $low2, my $hash, $$buf) = unpack("A$len C2 C4 A20 A*", $$buf);
-				push @sublist, {type => "file", size => $high1 * 16777216 + $high2 * 65536 + $low1 * 256 + $low2, name => decode('utf-8', $file), mode => mode2s ($high * 256 + $low), hash => unpack "H*", $hash};
+				(my $file, my $flags, my $len, my $hash, $$buf) = unpack "n/A* n N A20 A*", $$buf;
+				push @sublist, {type => "file", size => $len, name => decode('utf-8', $file), mode => mode2s ($flags), hash => unpack "H*", $hash};
 			}
 			$sublist[-1]->{list} = func($buf) case 'I';
 			return [@sublist] case 'U';
