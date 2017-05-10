@@ -3,7 +3,6 @@ package myconst;
 use strict;
 use warnings;
 use Scalar::Util 'looks_like_number';
-use Switch;
 
 =encoding utf8
 
@@ -45,10 +44,12 @@ sub import {
 	while (my ($key, $value) = each %hash){
 		die if ref $key eq "ARRAY" or ref $key eq "HASH" or not defined $key or looks_like_number ($key) or not $key =~ /^\w+$/ or ref $value eq "ARRAY";
 		map {die if ref $value->{$_} eq "ARRAY" or ref $value->{$_} eq "HASH" or looks_like_number($_) or not $_=~ /^\w+$/} keys %{$value} if (ref $value eq "HASH");
-		switch(ref $value){
-			case "" {push @import, {name => $key, value => $value, group => "all"}}
-			case "HASH" {push @import, {name => $_, value => $value->{$_}, group => $key} foreach (keys %{$value})}
-			else {die;}
+		if (ref $value eq "") {
+			push @import, {name => $key, value => $value, group => "all"};
+		} elsif (ref $value eq "HASH") {
+			push @import, {name => $_, value => $value->{$_}, group => $key} foreach (keys %{$value});
+		} else {
+			die 'Bad input';
 		}
 	}
 	no strict "refs";
