@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Note</title>
+		<style>
+			#note {
+				border: 1px solid;
+				height: 250px;
+				width: 500px;
+				resize: none;
+			}
+			#readers {
+				border: 1px solid;
+				height: 250px;
+				width: 500px;
+				resize: none;
+			}
+			#share {
+				border: 1px solid;				
+				height: 30px;
+				width: 500px;
+			}
+		</style>
+	</head>
+	<body>
+		<form method="post" action="/notes">
+			<textarea id="note" name="note" <%note%>></textarea><br>
+			<select multiple id="readers" name="readers"><%readers%></select><br>
+			<button type="submit" id ="share">Поделиться</button>
+			<input type="hidden" name="token" value="<%token%>">
+		</form>
+	</body>
+</html>

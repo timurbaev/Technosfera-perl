@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<title>Register</title>
+		<script type ="text/javascript">
+			function check(login, password, password1) {
+				var reason = "";
+				if (!(<%login%>.test(login)))
+					reason += "Bad login\n";
+				if (!(<%password%>.test(password)) || !(<%password%>.test(password1)))
+					reason += "Bad password\n";
+				if (password != password1)
+					reason += "Passwords do not match\n";
+				if (reason == "")
+					return true;
+				alert(reason);
+				return false;				
+			}
+		</script>
+	</head>
+	<body>
+		<form action="/register" method="post">
+			<input type="text" name="login" maxlength = 20 placeholder="Login">
+			<input type="password" name="password" maxlength = 20 placeholder="Password">
+			<input type="password" name="password1" maxlength = 20 placeholder="Confirm password">
+			<button type="submit" onclick="return check(this.form.login.value, this.form.password.value, this.form.password1.value)">Sign Up</button>
+			<input type="hidden" name="token" value="<%token%>">
+		</form>
+	</body>
+</html>

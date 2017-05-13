@@ -1,0 +1,26 @@
+appname: "notes_web"
+layout: "main"
+charset: "UTF-8"
+template: "simple"
+engines:
+  template:
+    template_toolkit:
+      start_tag: '<%'
+      end_tag:   '%>'
+
+session: YAML
+engines:
+  session:
+    YAML:
+      cookie_duration: 3600
+
+
+plugins:
+  Database:
+    driver: 'mysql'
+    database: 'notes_web'
+    username: 'notes'
+    password: 'web'
+    on_connect_do:
+      - "SET NAMES 'utf8'"
+      - "SET CHARACTER SET 'utf8'"
